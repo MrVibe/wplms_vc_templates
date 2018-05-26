@@ -4,12 +4,12 @@ Plugin Name: WPLMS VC Templates
 Plugin URI: http://www.Vibethemes.com
 Description: A WPLMS Addon to calculate the time spent by users inside the course.
 Version: 1.0
-Author: Vibethemes (H.K.)
+Author: Vibethemes
 Author URI: http://www.vibethemes.com
-Text Domain: wplms-ut
+Text Domain: wplms-vc-templates
 */
 /*
-Copyright 2017  VibeThemes  (email : vibethemes@gmail.com)
+Copyright 2018  VibeThemes  (email : vibethemes@gmail.com)
 */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,7 +56,7 @@ add_action('current_screen',function($current_screen){
 		   	$wplms_vc_templates = fread($fh,filesize($myFile ));
 
 		    fclose($fh); 
-		    $wplms_vc_templates = unserialize(base64_decode($wplms_vc_templates));
+		    $wplms_vc_templates = unserialize(json_decode($wplms_vc_templates));
 		    //$wplms_vc_templates = string_to_array($wplms_vc_templates);
 
 		    update_option('wpb_js_templates',$wplms_vc_templates);
@@ -85,7 +85,7 @@ add_action('current_screen',function($current_screen){
 		if(isset($_GET['fetch_wplms_vc_templates']) && current_user_can('manage_options')){
 
 			$wplms_vc_templates = get_option('wpb_js_templates');
-			$wplms_vc_templates = base64_encode(serialize($wplms_vc_templates));
+			$wplms_vc_templates = json_encode(serialize($wplms_vc_templates));
 			
 			$myFile = plugin_dir_path( __FILE__ )."/export.txt";
 		    $fh = fopen($myFile, 'w+');
