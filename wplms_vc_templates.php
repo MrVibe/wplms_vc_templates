@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 if( !defined('WPLMS_VC_TEMAPLTES_VERSION')){
-    define('WPLMS_VC_TEMAPLTES_VERSION','1.0');
+    define('WPLMS_VC_TEMAPLTES_VERSION','1.1');
 }
 
 
@@ -48,11 +48,12 @@ add_filter('wplms_sync_settings',function($args){
 			);
 	return $args;
 });
+
+
 //Change below to register activation hook when finalised
 add_action('current_screen',function($current_screen){
 
 	if($current_screen->base == 'lms_page_lms-settings' && is_admin()){
-
 
 		$templates_version = get_option('wplms_vc_templates');
 
@@ -67,14 +68,14 @@ add_action('current_screen',function($current_screen){
 			});
 		}
 
-		if(isset($_GET['add_wplms_vc_templates']) && current_user_can('manage_options')){
+		if($templates_version != WPLMS_VC_TEMAPLTES_VERSION && isset($_GET['add_wplms_vc_templates']) && current_user_can('manage_options')){
 			
 			$myFile = plugin_dir_path( __FILE__ )."/export.txt";
 		    $fh = fopen($myFile, 'r');
 		   	$wplms_vc_templates = fread($fh,filesize($myFile ));
 
 		    fclose($fh); 
-		    $wplms_vc_templates = unserialize(json_decode($wplms_vc_templates));
+		    $wplms_vc_templates = json_decode($wplms_vc_templates,true);
 		    //$wplms_vc_templates = string_to_array($wplms_vc_templates);
 		    update_option('wplms_vc_templates',WPLMS_VC_TEMAPLTES_VERSION);
 		    update_option('wpb_js_templates',$wplms_vc_templates);
@@ -96,19 +97,44 @@ function string_to_array($string) {
 
 add_action('current_screen',function($current_screen){
 
-
+	
 
 	if($current_screen->base == 'lms_page_lms-settings' && is_admin()){
 
 		if(isset($_GET['fetch_wplms_vc_templates']) && current_user_can('manage_options')){
 
-			$wplms_vc_templates = get_option('wpb_js_templates');
-			$wplms_vc_templates = json_encode(serialize($wplms_vc_templates));
 			
+			
+			//read existing data in export.txt file
+			$myFile1 = plugin_dir_path( __FILE__ )."/export.txt";
+		    $fhr = fopen($myFile1, 'r');
+		   	$wplms_vc_templates_read = fread($fhr,filesize($myFile1 ));
+
+		    fclose($fhr); 
+		    $wplms_vc_templates_read = json_decode($wplms_vc_templates_read,true);
+
+		    $templates_final = array();
+		    if(!empty($wplms_vc_templates_read)){
+		    	 $templates_final = $wplms_vc_templates_read;
+		    }
+		    
+
+
+		    $wplms_vc_templates = get_option('wpb_js_templates');
+		    
+		    if(!empty($wplms_vc_templates)){
+		    	foreach ($wplms_vc_templates as $key => $template) {
+		    		$templates_final[$key] =  $template;
+		    	}
+		    }
+
+
+			$wplms_vc_templates = json_encode($templates_final);
 			$myFile = plugin_dir_path( __FILE__ )."/export.txt";
 		    $fh = fopen($myFile, 'w+');
 		    fwrite($fh, $wplms_vc_templates );
 		    fclose($fh); 
+		   
 		}
 	}
-});                                                                                                                                                                                                      
+});                                                                                                                                             
