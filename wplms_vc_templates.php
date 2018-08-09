@@ -50,23 +50,25 @@ add_filter('wplms_sync_settings',function($args){
 });
 
 
+
+add_action('admin_notices',function(){
+
+	$templates_version = get_option('wplms_vc_templates');
+
+	if($templates_version != WPLMS_VC_TEMAPLTES_VERSION){
+		
+		if(isset($_GET['add_wplms_vc_templates']) && current_user_can('manage_options')){
+			echo '<div class="message error"><p>WPLMS VC templates migrated ! Check Visual composer template library.</a></p></div>';
+		}else{
+			echo '<div class="message error"><p>Migrate VC templates from WPLMS. <a href="?page=lms-settings&add_wplms_vc_templates" class="button-primary">Click to Migrate</a></p></div>';	
+		}
+		
+	}
+});
 //Change below to register activation hook when finalised
 add_action('current_screen',function($current_screen){
 
 	if($current_screen->base == 'lms_page_lms-settings' && is_admin()){
-
-		$templates_version = get_option('wplms_vc_templates');
-
-		if($templates_version != WPLMS_VC_TEMAPLTES_VERSION){
-			add_action('admin_notices',function(){
-				if(isset($_GET['add_wplms_vc_templates']) && current_user_can('manage_options')){
-					echo '<div class="message error"><p>WPLMS VC templates migrated ! Check Visual composer template library.</a></p></div>';
-				}else{
-					echo '<div class="message error"><p>Migrate VC templates from WPLMS. <a href="?page=lms-settings&add_wplms_vc_templates" class="button-primary">Click to Migrate</a></p></div>';	
-				}
-				
-			});
-		}
 
 		if($templates_version != WPLMS_VC_TEMAPLTES_VERSION && isset($_GET['add_wplms_vc_templates']) && current_user_can('manage_options')){
 			
