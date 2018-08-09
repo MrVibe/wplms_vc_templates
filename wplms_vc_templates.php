@@ -3,7 +3,7 @@
 Plugin Name: WPLMS VC Templates
 Plugin URI: http://www.Vibethemes.com
 Description: A WPLMS Addon to calculate the time spent by users inside the course.
-Version: 1.0
+Version: 1.1
 Author: Vibethemes
 Author URI: http://www.vibethemes.com
 Text Domain: wplms-vc-templates
@@ -15,6 +15,10 @@ Copyright 2018  VibeThemes  (email : vibethemes@gmail.com)
 if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
+if( !defined('WPLMS_VC_TEMAPLTES_VERSION')){
+    define('WPLMS_VC_TEMAPLTES_VERSION','1.0');
+}
+
 
 add_action( 'init', 'wplms_vc_templates_update' );
 function wplms_vc_templates_update() {
@@ -49,6 +53,20 @@ add_action('current_screen',function($current_screen){
 
 	if($current_screen->base == 'lms_page_lms-settings' && is_admin()){
 
+
+		$templates_version = get_option('wplms_vc_templates');
+
+		if($templates_version != WPLMS_VC_TEMAPLTES_VERSION){
+			add_action('admin_notices',function(){
+				if(isset($_GET['add_wplms_vc_templates']) && current_user_can('manage_options')){
+					echo '<div class="message error"><p>WPLMS VC templates migrated ! Check Visual composer template library.</a></p></div>';
+				}else{
+					echo '<div class="message error"><p>Migrate VC templates from WPLMS. <a href="?page=lms-settings&add_wplms_vc_templates" class="button-primary">Click to Migrate</a></p></div>';	
+				}
+				
+			});
+		}
+
 		if(isset($_GET['add_wplms_vc_templates']) && current_user_can('manage_options')){
 			
 			$myFile = plugin_dir_path( __FILE__ )."/export.txt";
@@ -58,7 +76,7 @@ add_action('current_screen',function($current_screen){
 		    fclose($fh); 
 		    $wplms_vc_templates = unserialize(json_decode($wplms_vc_templates));
 		    //$wplms_vc_templates = string_to_array($wplms_vc_templates);
-
+		    update_option('wplms_vc_templates',WPLMS_VC_TEMAPLTES_VERSION);
 		    update_option('wpb_js_templates',$wplms_vc_templates);
 		}
 	}
@@ -78,7 +96,7 @@ function string_to_array($string) {
 
 add_action('current_screen',function($current_screen){
 
-	
+
 
 	if($current_screen->base == 'lms_page_lms-settings' && is_admin()){
 
