@@ -2,7 +2,7 @@
 /*
 Plugin Name: WPLMS VC Templates
 Plugin URI: http://www.Vibethemes.com
-Description: A WPLMS Addon to calculate the time spent by users inside the course.
+Description: A WPLMS addon which adds WPLMS demo pages in VC templates
 Version: 1.1
 Author: Vibethemes
 Author URI: http://www.vibethemes.com
